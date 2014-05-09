@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!-- saved from url=(0038)http://getbootstrap.com/examples/grid/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>Websocket Test</title>
+
+<!-- Bootstrap core CSS -->
+<link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Custom styles for this template -->
+<!-- <link href="http://getbootstrap.com/examples/grid/grid.css" rel="stylesheet"> -->
+
+<!-- Just for debugging purposes. Don't actually copy this line! -->
+<!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+
+<body style="">
+  <div class="container">
+
+    <div class="container">
+      <div class="page-header">
+        <h1>PebbleMac</h1>
+      </div>
+      <label for="channel">Unique Code</label><br>
+      <input id="channel" placeholder="ex. abcd">
+      <br><br>
+      <button class="btn btn-primary btn-large" onclick="done()">Submit</button>
+    </div> <!-- /container -->
+
+
+<!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+
+  <script language="javascript" type="text/javascript">  
+    var channel;
+    function init() { 
+      channel = document.getElementById("channel");
+      channel.value=localStorage.getItem("channel");
+    }  
+
+    function save() {
+      localStorage.setItem("channel",channel.value);
+    }
+
+    function done() {
+      console.log("Hey");
+      save();
+      var data=JSON.stringify({code:channel.value.trim()});
+      window.location.href = "pebblejs://close#"+data;
+    }
+    window.addEventListener("load", init, false);
+
+  </script>
+</body>
+</html>

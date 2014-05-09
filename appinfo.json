@@ -1,0 +1,129 @@
+{
+  "uuid": "51143a62-5176-448b-943b-22ad7df035cd",
+  "shortName": "PebbleMac",
+  "longName": "PebbleMac",
+  "companyName": "Tyler Hoffman",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "capabilities": [ "configurable" ],
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {
+    "_connected": 0,
+    "_connectedTo": 1,
+    "_headerText": 2,
+    "_mainText": 3,
+    "_footerText": 4,
+    "_position": 5,
+    "_duration":6,
+    "_shuffle": 7,
+    "_playing": 8,
+    "_appVolume": 9,
+    "_sysVolume": 10,
+    "_app": 11,
+    "_command": 12
+  },
+  "resources": {
+    "media": [
+      {
+        "type": "png",
+        "name": "ICON",
+        "file": "icon.png",
+        "menuIcon": true
+      },
+      {
+        "type": "png",
+        "name": "DOTTED_STATUS",
+        "file": "images/dotted_status.png"
+      },
+      {
+        "type": "png",
+        "name": "STATUS_BAR_ICON_POWERPOINT",
+        "file": "images/status_bar_icon_powerpoint.png"
+      },
+      {
+        "type": "png",
+        "name": "STATUS_BAR_ICON_ITUNES",
+        "file": "images/status_bar_icon_itunes.png"
+      },
+      {
+        "type": "png",
+        "name": "STATUS_BAR_ICON_SPOTIFY",
+        "file": "images/status_bar_icon_spotify.png"
+      },
+      {
+        "type": "png",
+        "name": "STATUS_BAR_ICON_KEYNOTE",
+        "file": "images/status_bar_icon_keynote.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_PROGRESS_BAR_CLOCK",
+        "file": "images/progress_bar_clock.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_PROGRESS_BAR_VOLUME_ICON",
+        "file": "images/progress_bar_volume_icon.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_PROGRESS_BAR_SHUFFLE",
+        "file": "images/progress_bar_shuffle.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_PROGRESS_BAR_NO_SHUFFLE",
+        "file": "images/progress_bar_no_shuffle.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ACTION_REFRESH",
+        "file": "images/action_icon_refresh.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ACTION_LEFT_ARROW",
+        "file": "images/action_icon_left_arrow.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ACTION_RIGHT_ARROW",
+        "file": "images/action_icon_right_arrow.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ACTION_REWIND",
+        "file": "images/action_icon_rewind.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ACTION_FAST_FORWARD",
+        "file": "images/action_icon_fast_forward.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ACTION_PLAY",
+        "file": "images/action_icon_play.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ACTION_PAUSE",
+        "file": "images/action_icon_pause.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ACTION_VOLUME_UP",
+        "file": "images/action_icon_volume_up.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ACTION_VOLUME_DOWN",
+        "file": "images/action_icon_volume_down.png"
+      }
+    ]
+  }
+}
+
+
