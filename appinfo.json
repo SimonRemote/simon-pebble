@@ -1,10 +1,10 @@
 {
   "uuid": "51143a62-5176-448b-943b-22ad7df035cd",
-  "shortName": "PebbleMac",
-  "longName": "PebbleMac",
+  "shortName": "SimonRemote",
+  "longName": "SimonRemote",
   "companyName": "Tyler Hoffman",
   "versionCode": 1,
-  "versionLabel": "1.0.0",
+  "versionLabel": "0.9.0",
   "capabilities": [ "configurable" ],
   "watchapp": {
     "watchface": false
