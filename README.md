@@ -1,88 +1,59 @@
-# PebbleMac
-(named change soon...it's not only Pebbles anymore)
+# SimonRemote - Pebble
 
-## Control your Mac computer through your Pebble.
-This application(s) will allow you to control your Mac's various scriptable (AppleScript) features through your Pebble or other smart watch. 
+This allows one to control many aspects of their Mac from the SimonRemote Pebble app. It requires the [companion application](https://github.com/simonremote/simon-mac) installed on the Mac computer. 
 
-I have set up a server similar to FireBase in which it passes data seamlessly from one device to another. In this case that is data from the Pebble to the Mac and vice versa. 
+SimonRemote app should work in most scenarios (Wifi, 3G, 4G, etc), however, if the Pebble app (on the phone) is backgrounded, the watch won't update information automatically. That is what the *refresh* button is for in the features list. 
 
-Some existing solutions already exist to some degree:
+## Setup
 
-- [Pebble Slides](https://github.com/luisivan/pebble-slides)
-- [Joseph Schmitt's solution](http://joe.sh/using-pebble-control-mac)
-- [libpebble](https://github.com/Hexxeh/libpebble)
+1. Ensure that the [Pebble SDK](https://developer.getpebble.com/2/) is installed properly.
+2. Download the latest SimonRemote-Pebble source code from from [here](https://github.com/SimonRemote/simon-pebble/releases)
+3. cd into directory and run `pebble build`
+4. `pebble install`
+5. In the configuration page, enter the "Channel" given in the menubar dropdown from the Mac application and click 'Submit'
 
-However, there are downfalls to each. Pebble Slides solution is limited to controlling a computer's keyboard and forces the user to run a python server and deal with ports. The last two both use libpebble, which is connecting the Pebble directly to the Mac using Bluetooth, which isn't reliable and also is inconvinient for the end user.
+![](http://i.imgur.com/kmkbzwN.png) 
 
-## Benefits of my solution
-### A few easy steps.
+> The Pebble app has not been submitted to the Pebble App Store yet, so I have only listed instructions for installing from source.
 
-1. Load up the application and click on the menu bar icon. Take note of channel code
+## Features
 
-    ![](http://i.imgur.com/nUC50gL.png)
+### PowerPoint and Keynote
 
-2. Go to the Pebble application under PebbleMac's settings page and enter that code. Click Submit
+This is a brief rundown of how to control PowerPoint on your Mac computer. The exact same interface is applied to Keynote and any other future additions of presentation software.
 
-    ![](http://i.imgur.com/zMIUhzi.png)
+![](http://i.imgur.com/7xN5YG3.png)
 
-3. Load the Pebble app and control.
+This is the main screen. Shown on this screen is the *current slide* and the *time elapsed* in the manual timer. To start the timer, click *play*. To stop the timer, click the *pause* button.
 
-    ![](http://i.imgur.com/J2DIfbx.png)
-    ![](http://i.imgur.com/WtKslFR.png)
+![](http://i.imgur.com/vLVPT7a.png) 
 
-### Network indifferent
+To *refresh* the information shown on the watch, long press the bottom button
 
-My solution will work over any type of internet connection since both clients connect simultaneously to the server. There is no requirement to open ports or be on the same network. Clients can disconnect and connect as they choose and restore sessions.
+![](http://i.imgur.com/48cJC1Y.png) 
 
-### Multiple Applications
+To control the *volume* of the computer, long press the center button and the controls will change. The top button will increase the *volume* and the bottom one will decrease the *volume*.
 
-The Pebble application being developed currently will be released with support for the following applications
+![](http://i.imgur.com/2jUzWQx.png) 
 
-- iTunes
-- Spotify
-- Rdio
-- Keynote
-- PowerPoint
-- VLC
+### iTunes and Spotify
 
-Adding more is easy.
+This is a brief rundown of how to control Spotify on your Mac computer. The exact same interface is applied to iTunes and any other future additions of music players.
 
-### Two-Way Communication
+![](http://i.imgur.com/keCD42y.png) 
 
-The server has the ability to send information in both directions, so when you change a song on the Pebble, the next song will be updated on the screen instantly.
+This is the main screen. Shown on this screen is the current *artist*, *track*, *album*, *seek* and *shuffle status*. The available controls are *previous song*, *play/pause*, and *next song*.
 
-## Future ideas 
-### All applications
-- Reconnect shortcut
-- Choose computer?
+![](http://i.imgur.com/VEnmxaL.png) 
 
-### PowerPoint
-- Volume control
-- Notes fetching/displaying
-- Force next/previous slide (skip animation events)
-- Progress bar
+To toggle *shuffling*, long press the top button
 
-### Keynote
-- Do it
-- Volume control
-- Notes fetching/displaying
-- Force next/previous slide (skip animation events)
-- Progress bar
+![](http://i.imgur.com/Ihs8qVU.png) 
 
-### Music Player
-- Do it
-- Volume control
-- Progress bar
+To *refresh* the information shown on the watch, long press the bottom button
 
-### VLC
-- Do it
-- Volume control
-- Progress bar
+![](http://i.imgur.com/F94CqLA.png) 
 
-## Projects Used
+To control the *volume* of the computer, long press the center button and the controls will change. The top button will increase the *volume* and the bottom one will decrease the *volume*.
 
-- [WebSocket-Node](https://github.com/Worlize/WebSocket-Node)
-- [Popup](https://github.com/shpakovski/Popup)
-- [SkipStone](https://github.com/Skipstone/Skipstone) (for reference)
-
-
+![](http://i.imgur.com/Y5oOD8X.png) 
