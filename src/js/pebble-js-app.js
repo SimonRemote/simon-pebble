@@ -1,9 +1,7 @@
-function ReconnectingWebSocket(e,f){f=f||[];this.debug=false;this.reconnectInterval=1000;this.timeoutInterval=2000;var d=this;var b;var g=false;var a=false;this.url=e;this.protocols=f;this.readyState=WebSocket.CONNECTING;this.URL=e;this.onopen=function(h){};this.onclose=function(h){};this.onconnecting=function(h){};this.onmessage=function(h){};this.onerror=function(h){};function c(h){b=new WebSocket(e,f);d.onconnecting();if(d.debug||ReconnectingWebSocket.debugAll){console.debug("ReconnectingWebSocket","attempt-connect",e);}var i=b;var j=setTimeout(function(){if(d.debug||ReconnectingWebSocket.debugAll){console.debug("ReconnectingWebSocket","connection-timeout",e);}a=true;i.close();a=false;},d.timeoutInterval);b.onopen=function(k){clearTimeout(j);if(d.debug||ReconnectingWebSocket.debugAll){console.debug("ReconnectingWebSocket","onopen",e);}d.readyState=WebSocket.OPEN;h=false;d.onopen(k);};b.onclose=function(k){clearTimeout(j);b=null;if(g){d.readyState=WebSocket.CLOSED;d.onclose(k);}else{d.readyState=WebSocket.CONNECTING;d.onconnecting();if(!h&&!a){if(d.debug||ReconnectingWebSocket.debugAll){console.debug("ReconnectingWebSocket","onclose",e);}d.onclose(k);}setTimeout(function(){c(true);},d.reconnectInterval);}};b.onmessage=function(k){if(d.debug||ReconnectingWebSocket.debugAll){console.debug("ReconnectingWebSocket","onmessage",e,k.data);}d.onmessage(k);};b.onerror=function(k){if(d.debug||ReconnectingWebSocket.debugAll){console.debug("ReconnectingWebSocket","onerror",e,k);}d.onerror(k);};}c(e);this.send=function(h){if(b){if(d.debug||ReconnectingWebSocket.debugAll){console.debug("ReconnectingWebSocket","send",e,h);}return b.send(h);}else{throw"INVALID_STATE_ERR : Pausing to reconnect websocket";}};this.close=function(){g=true;if(b){b.close();}};this.refresh=function(){if(b){b.close();}};}ReconnectingWebSocket.debugAll=false;
-
 var channel;
-var server = "ws://simon-server.tyhoff.com/";
+var server;
 var hasListener;
-var connected = false;
+var connected;
 var websocket;
 
 /* from https://raw.github.com/Skipstone/Skipstone/master/js/appmessage.js */
@@ -76,14 +74,13 @@ var wsMessageQueue = {
 };
 
 
-
-
 function connectWebsocket() { 
   if (websocket !== undefined && websocket.readyState === WebSocket.CONNECTING) {
     console.log("websocket already connecting\n");
     return;
-  } else if (websocket !== undefined && websocket.readyState === WebSocket.OPEN) {
+  } else if (websocket !== undefined && websocket !== null) {
     websocket.close();
+    websocket = null;
   }
 
   connected = false;
@@ -181,7 +178,7 @@ function onMessage(event) {
 
       //get rid of this later on, possibly go to menu and only show one table view 
       //cell with a failed to connect cell
-      Pebble.showSimpleNotificationOnPebble('PebbleMac', msg.status.message);
+      Pebble.showSimpleNotificationOnPebble('SimonRemote', msg.status.message);
 
     } else {
       hasListener = true;
@@ -226,6 +223,8 @@ function websocketSend(message) {
 
 Pebble.addEventListener("ready", function() {
   console.log("javascript ready");
+  server = "ws://simon-server.tyhoff.com/";
+  connected = false;
   channel = localStorage.getItem('code');
   connectWebsocket();
 });
@@ -244,7 +243,7 @@ Pebble.addEventListener("appmessage", function(e) {
 });
 
 Pebble.addEventListener("showConfiguration", function (e) {
-	Pebble.openURL("http://dev.tyhoffman.com/pebblemac.html");
+	Pebble.openURL("http://simonremote.github.io/pebbleconfig.html");
 });
 
 Pebble.addEventListener("webviewclosed", function (e) {
