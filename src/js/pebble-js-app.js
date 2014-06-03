@@ -225,7 +225,10 @@ Pebble.addEventListener("ready", function() {
   console.log("javascript ready");
   server = "ws://simon-server.tyhoff.com/";
   connected = false;
-  channel = localStorage.getItem('code');
+  channel = window.localStorage.getItem('code');
+  if (channel === "") {
+    Pebble.showSimpleNotificationOnPebble('SimonRemote', "Please add channel in app settings.");
+  }
   connectWebsocket();
 });
 
@@ -249,7 +252,6 @@ Pebble.addEventListener("showConfiguration", function (e) {
 Pebble.addEventListener("webviewclosed", function (e) {
 	if (!e.response) return;
 	var payload = JSON.parse(e.response);
-	localStorage.setItem('code', payload.code);
   channel = payload.code;
   connectWebsocket();
 });
