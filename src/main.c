@@ -11,6 +11,9 @@ bool wsConnected;
 static Window *window;
 static MenuLayer * menu_layer;
 
+static int16_t menu_get_cell_height_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *callback_context) {
+  return 35;
+}
 
 static uint16_t menu_get_num_sections_callback(MenuLayer *menu_layer, void *data) {
   return NUM_MENU_SECTIONS;
@@ -135,6 +138,7 @@ static void window_load(Window *window) {
   menu_layer_set_callbacks(menu_layer, NULL, (MenuLayerCallbacks){
     .get_num_sections = menu_get_num_sections_callback,
     .get_num_rows = menu_get_num_rows_callback,
+    .get_cell_height = menu_get_cell_height_callback,
     .get_header_height = menu_get_header_height_callback,
     .draw_header = menu_draw_header_callback,
     .draw_row = menu_draw_row_callback,
