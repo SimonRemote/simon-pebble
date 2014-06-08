@@ -362,7 +362,6 @@ static void window_unload(Window *window) {
   gbitmap_destroy(progress_bar_shuffle);
   gbitmap_destroy(progress_bar_no_shuffle);
   gbitmap_destroy(dotted_status);
-  gbitmap_destroy(dotted_status);
 
   text_layer_destroy(header_text);
   text_layer_destroy(main_text);
