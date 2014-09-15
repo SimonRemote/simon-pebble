@@ -223,7 +223,7 @@ function websocketSend(message) {
 
 Pebble.addEventListener("ready", function() {
   console.log("javascript ready");
-  server = "wss://simon-server.tyhoff.com/";
+  server = "ws://tyhoff.com:9234";
   connected = false;
   channel = window.localStorage.getItem('code') || "";
   console.log("channel: " + channel);
