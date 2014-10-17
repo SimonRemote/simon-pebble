@@ -4,7 +4,7 @@
   "longName": "SimonRemote",
   "companyName": "Tyler Hoffman",
   "versionCode": 1,
-  "versionLabel": "0.9.0",
+  "versionLabel": "1.0",
   "capabilities": [ "configurable" ],
   "watchapp": {
     "watchface": false

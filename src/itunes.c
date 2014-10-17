@@ -58,10 +58,11 @@ static uint16_t duration;
 static bool controlling_volume;
 static bool is_playing;
 static bool is_shuffling;
-static bool shuffle_icon_showing; 
+static bool shuffle_icon_showing;
 static bool refresh_icon_showing;
 static bool has_stale_information;
 
+static bool has_loaded = false;
 
 void itunes_init(void) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Window - iTunes init %p", window);
@@ -111,6 +112,10 @@ void itunes_connected(bool connected) {
 
 
 void itunes_update_ui(DictionaryIterator *iter) {
+  if (!has_loaded) {
+    return;
+  }
+
   Tuple* tuple = dict_read_first(iter);
 
   while(tuple) {
@@ -141,7 +146,7 @@ void itunes_update_ui(DictionaryIterator *iter) {
         update_progress_bar_shuffle();
         break;
       case KEY_PLAYING:
-        is_playing = (tuple->value->uint32) ? true : false;        
+        is_playing = (tuple->value->uint32) ? true : false;
         update_playing_status();
         break;
       case KEY_APPVOLUME:
@@ -242,9 +247,9 @@ static void select_long_click_handler(ClickRecognizerRef recognizer, void *conte
 static void up_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (!controlling_volume) {
     if (is_shuffling) {
-      action_bar_layer_set_icon(action_bar, BUTTON_ID_UP, progress_bar_no_shuffle);  
+      action_bar_layer_set_icon(action_bar, BUTTON_ID_UP, progress_bar_no_shuffle);
     } else {
-      action_bar_layer_set_icon(action_bar, BUTTON_ID_UP, progress_bar_shuffle);  
+      action_bar_layer_set_icon(action_bar, BUTTON_ID_UP, progress_bar_shuffle);
     }
     shuffle_icon_showing = true;
   }
@@ -260,7 +265,7 @@ static void up_long_click_release_handler(ClickRecognizerRef recognizer, void *c
 }
 
 static void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
-  action_bar_layer_set_icon(action_bar, BUTTON_ID_DOWN, action_icon_refresh);  
+  action_bar_layer_set_icon(action_bar, BUTTON_ID_DOWN, action_icon_refresh);
   refresh_icon_showing = true;
 }
 
@@ -344,10 +349,12 @@ static void window_load(Window *window) {
   bitmap_layer_set_bitmap(progress_bar_right_icon_layer, progress_bar_shuffle);
   layer_add_child(window_layer, bitmap_layer_get_layer(progress_bar_right_icon_layer));
 
+  has_loaded = true;
 }
 
 static void window_unload(Window *window) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Window - iTunes window_unload %p", window);
+  has_loaded = false;
 
   gbitmap_destroy(status_bar_icon);
   gbitmap_destroy(action_icon_rewind);

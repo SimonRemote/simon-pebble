@@ -55,6 +55,8 @@ static bool controlling_volume;
 static bool is_playing;
 static bool refresh_icon_showing;
 
+static bool has_loaded = false;
+
 void powerpoint_init(void) {
   slide_progress_text = malloc(20);
   time_text = malloc(10);
@@ -99,6 +101,10 @@ void powerpoint_deinit(void) {
 
 
 void powerpoint_update_ui(DictionaryIterator *iter) {
+  if (!has_loaded) {
+    return;
+  }
+
   Tuple* tuple = dict_read_first(iter);
 
   while(tuple) {
@@ -127,7 +133,7 @@ void powerpoint_update_ui(DictionaryIterator *iter) {
       case KEY_SHUFFLE:
         break;
       case KEY_PLAYING:
-        // is_playing = (tuple->value->uint32) ? true : false;        
+        // is_playing = (tuple->value->uint32) ? true : false;
         // update_playing_status();
         break;
       case KEY_APPVOLUME:
@@ -150,9 +156,9 @@ void powerpoint_update_ui(DictionaryIterator *iter) {
 }
 
 static void update_main_text() {
-  
+
   snprintf(slide_progress_text, 20, "%d of %d", position, duration);
-  text_layer_set_text(main_text, slide_progress_text); 
+  text_layer_set_text(main_text, slide_progress_text);
 }
 
 static void decrementPosition() {
@@ -173,13 +179,13 @@ static void update_playing_status() {
 
 static void update_progress_bar() {
   progress_bar_layer_set_value(progress_bar, (controlling_volume) ? sys_volume : (position*100)/duration);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "position: %d, duration: %d, progress: %d\n", position, duration, (position*100)/duration); 
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "position: %d, duration: %d, progress: %d\n", position, duration, (position*100)/duration);
 }
 
 static void update_timer() {
   uint16_t min = seconds / 60;
   uint16_t sec = seconds % 60;
-      
+
   snprintf(time_text, 10, "%02d:%02d", min, sec);
 
   // Now draw the strings.
@@ -213,17 +219,17 @@ static void select_single_click_handler(ClickRecognizerRef recognizer, void *con
 
 static void up_single_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (controlling_volume) {
-    send_request("volume_up");  
+    send_request("volume_up");
   } else {
-    send_request("previous"); 
+    send_request("previous");
   }
 }
 
 static void down_single_click_handler(ClickRecognizerRef recognizer, void *context) {
   if (controlling_volume) {
-    send_request("volume_down");  
+    send_request("volume_down");
   } else {
-    send_request("next"); 
+    send_request("next");
   }
 }
 
@@ -236,7 +242,7 @@ static void select_long_click_handler(ClickRecognizerRef recognizer, void *conte
 }
 
 static void down_long_click_handler(ClickRecognizerRef recognizer, void *context) {
-  action_bar_layer_set_icon(action_bar, BUTTON_ID_DOWN, action_icon_refresh);  
+  action_bar_layer_set_icon(action_bar, BUTTON_ID_DOWN, action_icon_refresh);
   refresh_icon_showing = true;
 }
 
@@ -302,10 +308,12 @@ static void window_load(Window *window) {
 
   tick_timer_service_subscribe(SECOND_UNIT, handle_second_tick);
 
+  has_loaded = true;
 }
 
 static void window_unload(Window *window) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Window - PowerPoint window_unload %p", window);
+  has_loaded = false;
 
   tick_timer_service_unsubscribe();
 
