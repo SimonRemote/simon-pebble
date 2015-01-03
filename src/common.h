@@ -1,3 +1,5 @@
+#pragma once
+
 #include <pebble.h>
 #include "progress_bar.h"
 
@@ -17,6 +19,8 @@ enum {
     KEY_SYSVOLUME   = 10,
     KEY_APP         = 11,
     KEY_COMMAND     = 12,
+    KEY_APACTIVE    = 13,
+    KEY_APDEVICES   = 14,
 };
 
 extern bool wsConnected;
@@ -46,3 +50,8 @@ void spotify_update_ui(DictionaryIterator *iter);
 /* Keynote */
 void keynote_control();
 void keynote_update_ui(DictionaryIterator *iter);
+
+/* System */
+void system_control();
+void system_update_ui(DictionaryIterator *iter);
+

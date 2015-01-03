@@ -1,8 +1,9 @@
 #include "common.h"
+#include "airplay.h"
 
 static void send_request(char * command);
 static void update_progress_bar_shuffle();
-static void update_playing_status();
+static void update_action_bar();
 static void update_progress_bar();
 static void back_single_click_handler(ClickRecognizerRef recognizer, void *context);
 static void select_single_click_handler(ClickRecognizerRef recognizer, void *context);
@@ -44,6 +45,7 @@ static GBitmap *action_icon_pause;
 static GBitmap *action_icon_volume_up;
 static GBitmap *action_icon_volume_down;
 static GBitmap *action_icon_refresh;
+static GBitmap *action_icon_airplay;
 static GBitmap *progress_bar_clock;
 static GBitmap *progress_bar_volume_icon;
 static GBitmap *progress_bar_shuffle;
@@ -82,6 +84,7 @@ void itunes_init(void) {
   action_icon_volume_up = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ACTION_VOLUME_UP);
   action_icon_volume_down = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ACTION_VOLUME_DOWN);
   action_icon_refresh = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ACTION_REFRESH);
+  action_icon_airplay = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ACTION_AIRPLAY);
   progress_bar_clock = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_PROGRESS_BAR_CLOCK);
   progress_bar_volume_icon = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_PROGRESS_BAR_VOLUME_ICON);
   progress_bar_shuffle = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_PROGRESS_BAR_SHUFFLE);
@@ -98,6 +101,8 @@ void itunes_init(void) {
   });
 
   send_request("info");
+
+  window_stack_push(window, true);
 }
 
 void itunes_deinit(void) {
@@ -116,7 +121,7 @@ void itunes_update_ui(DictionaryIterator *iter) {
     return;
   }
 
-  Tuple* tuple = dict_read_first(iter);
+  Tuple *tuple = dict_read_first(iter);
 
   while(tuple) {
     switch(tuple->key) {
@@ -147,7 +152,7 @@ void itunes_update_ui(DictionaryIterator *iter) {
         break;
       case KEY_PLAYING:
         is_playing = (tuple->value->uint32) ? true : false;
-        update_playing_status();
+        update_action_bar();
         break;
       case KEY_APPVOLUME:
         app_volume = (uint8_t)tuple->value->uint32;
@@ -157,6 +162,10 @@ void itunes_update_ui(DictionaryIterator *iter) {
         break;
       case KEY_APP:
         //we know it's iTunes
+        break;
+      case KEY_APDEVICES:
+      case KEY_APACTIVE:
+        airplay_new_tuple(tuple);
         break;
       default:
         break;
@@ -173,12 +182,20 @@ static void update_progress_bar_shuffle() {
   bitmap_layer_set_bitmap(progress_bar_right_icon_layer, is_shuffling ? progress_bar_shuffle : progress_bar_no_shuffle);
 }
 
-static void update_playing_status() {
-  action_bar_layer_set_icon(action_bar, BUTTON_ID_SELECT, is_playing ? action_icon_pause : action_icon_play);
+static void update_action_bar() {
+  if (controlling_volume) {
+    action_bar_layer_set_icon(action_bar, BUTTON_ID_UP, action_icon_volume_up);
+    action_bar_layer_set_icon(action_bar, BUTTON_ID_SELECT, action_icon_airplay);
+    action_bar_layer_set_icon(action_bar, BUTTON_ID_DOWN, action_icon_volume_down);
+  } else {
+    action_bar_layer_set_icon(action_bar, BUTTON_ID_UP, action_icon_rewind);
+    action_bar_layer_set_icon(action_bar, BUTTON_ID_SELECT, is_playing ? action_icon_pause : action_icon_play);
+    action_bar_layer_set_icon(action_bar, BUTTON_ID_DOWN, action_icon_fast_forward);
+  }
 }
 
 static void update_progress_bar() {
-  progress_bar_layer_set_value(progress_bar, (controlling_volume) ? sys_volume : (position*100)/duration);
+  progress_bar_layer_set_value(progress_bar, (controlling_volume) ? app_volume : (position * 100)/duration);
 }
 
 static void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
@@ -223,9 +240,13 @@ static void back_single_click_handler(ClickRecognizerRef recognizer, void *conte
 }
 
 static void select_single_click_handler(ClickRecognizerRef recognizer, void *context) {
-  send_request(is_playing ? "pause" : "play");
-  is_playing = !is_playing;
-  update_playing_status();
+  if (controlling_volume) {
+    airplay_control();
+  } else {
+    send_request(is_playing ? "pause" : "play");
+    is_playing = !is_playing;
+    update_action_bar();
+  }
 }
 
 static void up_single_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -238,9 +259,8 @@ static void down_single_click_handler(ClickRecognizerRef recognizer, void *conte
 
 static void select_long_click_handler(ClickRecognizerRef recognizer, void *context) {
   controlling_volume = !controlling_volume;
-  action_bar_layer_set_icon(action_bar, BUTTON_ID_UP, controlling_volume ? action_icon_volume_up : action_icon_rewind);
-  action_bar_layer_set_icon(action_bar, BUTTON_ID_DOWN, controlling_volume ? action_icon_volume_down : action_icon_fast_forward);
   bitmap_layer_set_bitmap(progress_bar_left_icon_layer, controlling_volume ? progress_bar_volume_icon : progress_bar_clock);
+  update_action_bar();
   update_progress_bar();
 }
 
@@ -356,6 +376,8 @@ static void window_unload(Window *window) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Window - iTunes window_unload %p", window);
   has_loaded = false;
 
+  destroy_airplay_data();
+
   gbitmap_destroy(status_bar_icon);
   gbitmap_destroy(action_icon_rewind);
   gbitmap_destroy(action_icon_fast_forward);
@@ -364,6 +386,7 @@ static void window_unload(Window *window) {
   gbitmap_destroy(action_icon_volume_up);
   gbitmap_destroy(action_icon_volume_down);
   gbitmap_destroy(action_icon_refresh);
+  gbitmap_destroy(action_icon_airplay);
   gbitmap_destroy(progress_bar_clock);
   gbitmap_destroy(progress_bar_volume_icon);
   gbitmap_destroy(progress_bar_shuffle);
@@ -386,5 +409,4 @@ static void window_unload(Window *window) {
 
 void itunes_control() {
   itunes_init();
-  window_stack_push(window, true);
 }

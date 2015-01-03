@@ -43,9 +43,8 @@ static GBitmap *progress_bar_clock;
 static GBitmap *progress_bar_volume_icon;
 
 static uint8_t sys_volume;
-static uint8_t app_volume;
-static int16_t position;
-static int16_t duration;
+static uint16_t position;
+static uint16_t duration;
 static char * slide_progress_text;
 static char * time_text;
 
@@ -89,6 +88,8 @@ void powerpoint_init(void) {
   });
 
   send_request("info");
+
+  window_stack_push(window, true);
 }
 
 void powerpoint_deinit(void) {
@@ -105,7 +106,7 @@ void powerpoint_update_ui(DictionaryIterator *iter) {
     return;
   }
 
-  Tuple* tuple = dict_read_first(iter);
+  Tuple *tuple = dict_read_first(iter);
 
   while(tuple) {
     switch(tuple->key) {
@@ -222,6 +223,9 @@ static void up_single_click_handler(ClickRecognizerRef recognizer, void *context
     send_request("volume_up");
   } else {
     send_request("previous");
+    decrementPosition();
+    update_main_text();
+    update_progress_bar();
   }
 }
 
@@ -230,6 +234,9 @@ static void down_single_click_handler(ClickRecognizerRef recognizer, void *conte
     send_request("volume_down");
   } else {
     send_request("next");
+    incrementPosition();
+    update_main_text();
+    update_progress_bar();
   }
 }
 
@@ -340,5 +347,4 @@ static void window_unload(Window *window) {
 
 void powerpoint_control() {
   powerpoint_init();
-  window_stack_push(window, true);
 }

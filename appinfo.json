@@ -22,7 +22,9 @@
     "_appVolume": 9,
     "_sysVolume": 10,
     "_app": 11,
-    "_command": 12
+    "_command": 12,
+    "_apActive": 13,
+    "_apDevices": 14
   },
   "resources": {
     "media": [
@@ -121,6 +123,16 @@
         "type": "png",
         "name": "IMAGE_ACTION_VOLUME_DOWN",
         "file": "images/action_icon_volume_down.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ACTION_AIRPLAY",
+        "file": "images/action_icon_airplay.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ACTION_CHECKMARK",
+        "file": "images/action_icon_checkmark.png"
       }
     ]
   }

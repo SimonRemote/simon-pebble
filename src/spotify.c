@@ -99,6 +99,8 @@ void spotify_init(void) {
   });
 
   send_request("info");
+
+  window_stack_push(window, true);
 }
 
 void spotify_deinit(void) {
@@ -117,7 +119,7 @@ void spotify_update_ui(DictionaryIterator *iter) {
     return;
   }
 
-  Tuple* tuple = dict_read_first(iter);
+  Tuple *tuple = dict_read_first(iter);
 
   while(tuple) {
     switch(tuple->key) {
@@ -179,7 +181,7 @@ static void update_playing_status() {
 }
 
 static void update_progress_bar() {
-  progress_bar_layer_set_value(progress_bar, (controlling_volume) ? sys_volume : (position*100)/duration);
+  progress_bar_layer_set_value(progress_bar, (controlling_volume) ? app_volume : (position*100)/duration);
 }
 
 static void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
@@ -387,5 +389,4 @@ static void window_unload(Window *window) {
 
 void spotify_control() {
   spotify_init();
-  window_stack_push(window, true);
 }

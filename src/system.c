@@ -1,13 +1,21 @@
 #include "common.h"
+#include "airplay.h"
 
-bool wsConnected;
+#define NUM_MENU_SECTIONS 2
+#define NUM_MENU_ROWS (KEYBOARD_MENU_ITEMS + VOLUME_MENU_ITEMS)
 
-#define NUM_MENU_SECTIONS 3
-#define NUM_MENU_ROWS (NUM_MUSIC_MENU_ITEMS + NUM_PRESENTATION_MENU_ITEMS + NUM_OTHER_MENU_ITEMS)
+#define KEYBOARD_MENU_ITEMS 5
+#define VOLUME_MENU_ITEMS 2
 
-#define NUM_MUSIC_MENU_ITEMS 2
-#define NUM_PRESENTATION_MENU_ITEMS 2
-#define NUM_OTHER_MENU_ITEMS 1
+static void send_request(char * command);
+static void window_load(Window *window);
+static void window_unload(Window *window);
+
+
+static Window *window;
+static MenuLayer *menu_layer;
+
+static bool has_loaded = false;
 
 static Window *window;
 static MenuLayer * menu_layer;
@@ -24,15 +32,11 @@ static uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t secti
   switch (section_index) {
     case 0:
       // Draw title text in the section header
-      return NUM_MUSIC_MENU_ITEMS;
+      return KEYBOARD_MENU_ITEMS;
       break;
 
     case 1:
-      return NUM_PRESENTATION_MENU_ITEMS;
-      break;
-
-    case 2:
-      return NUM_OTHER_MENU_ITEMS;
+      return VOLUME_MENU_ITEMS;
       break;
   }
   return 0;
@@ -50,13 +54,11 @@ static void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, ui
   switch (section_index) {
     case 0:
       // Draw title text in the section header
-      menu_cell_basic_header_draw(ctx, cell_layer, "Music");
+      menu_cell_basic_header_draw(ctx, cell_layer, "Keyboard");
       break;
+
     case 1:
-      menu_cell_basic_header_draw(ctx, cell_layer, "Presentation");
-      break;
-    case 2:
-      menu_cell_basic_header_draw(ctx, cell_layer, "Other");
+      menu_cell_basic_header_draw(ctx, cell_layer, "Volume");
       break;
   }
 }
@@ -65,34 +67,32 @@ static void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, ui
 static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
   // Switch on section
   switch (cell_index->section) {
-
-    // Music Player
     case 0:
       switch (cell_index->row) {
         case 0:
-          menu_cell_basic_draw(ctx, cell_layer, "iTunes", NULL, NULL);
+          menu_cell_basic_draw(ctx, cell_layer, "Space", NULL, NULL);
           break;
         case 1:
-          menu_cell_basic_draw(ctx, cell_layer, "Spotify", NULL, NULL);
+          menu_cell_basic_draw(ctx, cell_layer, "Up", NULL, NULL);
+          break;
+        case 2:
+          menu_cell_basic_draw(ctx, cell_layer, "Down", NULL, NULL);
+          break;
+        case 3:
+          menu_cell_basic_draw(ctx, cell_layer, "Right", NULL, NULL);
+          break;
+        case 4:
+          menu_cell_basic_draw(ctx, cell_layer, "Left", NULL, NULL);
           break;
       }
       break;
-
-    // Presentation
     case 1:
       switch (cell_index->row) {
         case 0:
-          menu_cell_basic_draw(ctx, cell_layer, "PowerPoint", NULL, NULL);
+          menu_cell_basic_draw(ctx, cell_layer, "Volume Up", NULL, NULL);
           break;
         case 1:
-          menu_cell_basic_draw(ctx, cell_layer, "Keynote", NULL, NULL);
-          break;
-      }
-      break;
-    case 2:
-      switch (cell_index->row) {
-        case 0:
-          menu_cell_basic_draw(ctx, cell_layer, "System", NULL, NULL);
+          menu_cell_basic_draw(ctx, cell_layer, "Volume Down", NULL, NULL);
           break;
       }
       break;
@@ -102,48 +102,80 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
 // Here we capture when a user selects a menu item
 static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
   switch (cell_index->section) {
-    // Music
+
     case 0:
       switch (cell_index->row) {
         case 0:
-          itunes_control();
+          send_request("space");
           break;
         case 1:
-          spotify_control();
+          send_request("up");
+          break;
+        case 2:
+          send_request("down");
+          break;
+        case 3:
+          send_request("right");
+          break;
+        case 4:
+          send_request("left");
           break;
       }
       break;
-
-    // Presentation
     case 1:
       switch (cell_index->row) {
         case 0:
-          powerpoint_control();
+          send_request("volume_up");
           break;
+        // Keynote
         case 1:
-          keynote_control();
-          break;
-      }
-      break;
-
-    // Other
-    case 2:
-      switch (cell_index->row) {
-        case 0:
-          system_control();
+          send_request("volume_down");
           break;
       }
       break;
   }
 }
 
-// Main window
+void system_init(void) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Window - System init %p", window);
+
+  window = window_create();
+  window_set_window_handlers(window, (WindowHandlers) {
+    .load = window_load,
+    .unload = window_unload,
+  });
+
+  send_request("info");
+
+  window_stack_push(window, true);
+}
+
+void system_deinit(void) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Window - System deinit %p", window);
+  // save some stuff
+  window_destroy(window);
+}
+
+void system_connected(bool connected) {
+  wsConnected = connected;
+}
+
+
+void system_update_ui(DictionaryIterator *iter) {
+  return;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
+
+static void send_request(char * command) {
+  send_command("System", command);
+}
+
+// Events
+
 static void window_load(Window *window) {
-  // Now we prepare to initialize the menu layer
-  // We need the bounds to specify the menu layer's viewport size
-  // In this case, it'll be the same as the window's
   Layer *window_layer = window_get_root_layer(window);
-  GRect bounds = layer_get_frame(window_layer);
+  GRect bounds = layer_get_bounds(window_layer);
 
   // Create the menu layer
   menu_layer = menu_layer_create(bounds);
@@ -164,34 +196,18 @@ static void window_load(Window *window) {
 
   // Add it to the window for display
   layer_add_child(window_layer, menu_layer_get_layer(menu_layer));
+
+  has_loaded = true;
 }
 
 static void window_unload(Window *window) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Window - System window_unload %p", window);
+  has_loaded = false;
+
   menu_layer_destroy(menu_layer);
-}
-
-static void init(void) {
-  window = window_create();
-  window_set_window_handlers(window, (WindowHandlers) {
-    .load = window_load,
-    .unload = window_unload,
-  });
-
-  const bool animated = true;
-  window_stack_push(window, animated);
-}
-
-static void deinit(void) {
   window_destroy(window);
 }
 
-int main(void) {
-  wsConnected = false;
-  appmessage_init();
-  init();
-
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
-
-  app_event_loop();
-  deinit();
+void system_control() {
+  system_init();
 }

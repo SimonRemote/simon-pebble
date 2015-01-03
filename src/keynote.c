@@ -43,9 +43,8 @@ static GBitmap *progress_bar_clock;
 static GBitmap *progress_bar_volume_icon;
 
 static uint8_t sys_volume;
-static uint8_t app_volume;
-static int16_t position;
-static int16_t duration;
+static uint16_t position;
+static uint16_t duration;
 static char * slide_progress_text;
 static char * time_text;
 
@@ -63,8 +62,8 @@ void keynote_init(void) {
 
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Window - Keynote init %p", window);
 
-  position = -1;
-  duration = -1;
+  position = 1;
+  duration = 1;
 
   controlling_volume = false;
   is_playing = false;
@@ -89,6 +88,8 @@ void keynote_init(void) {
   });
 
   send_request("info");
+
+  window_stack_push(window, true);
 }
 
 void keynote_deinit(void) {
@@ -105,7 +106,7 @@ void keynote_update_ui(DictionaryIterator *iter) {
     return;
   }
 
-  Tuple* tuple = dict_read_first(iter);
+  Tuple *tuple = dict_read_first(iter);
 
   while(tuple) {
     switch(tuple->key) {
@@ -119,16 +120,16 @@ void keynote_update_ui(DictionaryIterator *iter) {
         // text_layer_set_text(header_text, tuple->value->cstring);
         break;
       case KEY_MAINTEXT:
-        // text_layer_set_text(main_text, tuple->value->cstring);
+        text_layer_set_text(main_text, tuple->value->cstring);
         break;
       case KEY_FOOTERTEXT:
         // text_layer_set_text(footer_text, tuple->value->cstring);
         break;
       case KEY_POSITION:
-        if (position == -1) position = (uint16_t)tuple->value->uint32;
+        position = (uint16_t)tuple->value->uint32;
         break;
       case KEY_DURATION:
-        if (duration == -1) duration = (uint16_t)tuple->value->uint32;
+        duration = (uint16_t)tuple->value->uint32;
         break;
       case KEY_SHUFFLE:
         break;
@@ -346,5 +347,4 @@ static void window_unload(Window *window) {
 
 void keynote_control() {
   keynote_init();
-  window_stack_push(window, true);
 }

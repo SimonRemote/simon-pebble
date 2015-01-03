@@ -10,10 +10,10 @@ static char *translate_error(AppMessageResult result);
 void send_command(char * app, char * command) {
   Tuplet app_tup = TupletCString(KEY_APP, app);
   Tuplet command_tup = TupletCString(KEY_COMMAND, command);
-  
+
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
-  
+
   dict_write_tuplet(iter, &app_tup);
   dict_write_tuplet(iter, &command_tup);
   dict_write_end(iter);
@@ -44,6 +44,8 @@ static void in_received_handler(DictionaryIterator *iter, void *context) {
       keynote_update_ui(iter);
     } else if (!strcmp("PowerPoint", app->value->cstring)) {
       powerpoint_update_ui(iter);
+    } else if (!strcmp("System", app->value->cstring)) {
+      system_update_ui(iter);
     }
     return;
   }
